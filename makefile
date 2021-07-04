@@ -1,3 +1,3 @@
 build:
 	mkdir -p bin/
-	GOOS=linux go build -o bin/clam-desktop-notifier
+	GOOS=linux go build -o bin/clamnotify

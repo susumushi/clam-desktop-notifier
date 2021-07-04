@@ -9,7 +9,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/coreos/go-log/log"
+	"github.com/coreos/go-systemd/journal"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -17,7 +17,7 @@ func main() {
 	// 現在ログインしているユーザー一覧を取得する
 	output, err := exec.Command("/bin/bash", "-c", "who | awk '{print $1}' | sort | uniq").Output()
 	if err != nil {
-		panic(fmt.Sprintf("Get user list error: %s", err))
+		panic(fmt.Sprintf("get logined user list error: %s", err))
 	}
 	userNames := strings.Split(string(output), "\n")
 	userNames = userNames[:len(userNames)-1]
@@ -27,7 +27,9 @@ func main() {
 	virusFile := os.Getenv("CLAM_VIRUSEVENT_FILENAME")
 	alertMsg := fmt.Sprintf("Virus Detected: VirusName: %s, FileName: %s", virusName, virusFile)
 
-	log.Error(alertMsg)
+	if err := journal.Print(journal.PriCrit, alertMsg); err != nil {
+		panic(fmt.Sprintf("send logging faluer: %s", err))
+	}
 	for _, userName := range userNames {
 		// ログインしているユーザーのUIDを取得し、スイッチする。
 		u, _ := user.Lookup(userName)
