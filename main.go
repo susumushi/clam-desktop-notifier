@@ -15,7 +15,8 @@ import (
 
 func main() {
 	// 現在ログインしているユーザー一覧を取得する
-	output, err := exec.Command("/bin/bash", "-c", "who | awk '{print $1}' | sort | uniq").Output()
+	// 端末がスクリーンになっているユーザーのみ抽出する
+	output, err := exec.Command("/bin/bash", "-c", "who | grep -e ' :[0-9]' | awk '{print $1}' | sort | uniq").Output()
 	if err != nil {
 		panic(fmt.Sprintf("get logined user list error: %s", err))
 	}
